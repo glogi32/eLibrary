@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string("surname");
             $table->string("src")->nullable();
             $table->string("alt")->nullable();
+            $table->foreignId("created_by_user_id")->constrained("users");
             $table->softDeletes();
             $table->timestamps();
         });
