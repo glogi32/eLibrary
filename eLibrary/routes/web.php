@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\PagesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,12 +17,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('home');
+    return view('pages.home');
 });
 
 Route::get('/login', function () {
-    return view('login');
+    return view('pages.login');
 });
+
+Route::get("/options/authors",[PagesController::class,"authors"])->name("authors");
+
+Route::get("/authors",[AuthorController::class,"index"]);
 
 Route::post("/login",[AuthController::class,"login"])->name("login");
 Route::get("/logout",[AuthController::class,"logout"])->name("logout");

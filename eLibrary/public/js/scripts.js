@@ -1,7 +1,26 @@
-/*!
-* Start Bootstrap - Shop Homepage v5.0.5 (https://startbootstrap.com/template/shop-homepage)
-* Copyright 2013-2022 Start Bootstrap
-* Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-shop-homepage/blob/master/LICENSE)
-*/
-// This file is intentionally blank
-// Use this file to add JavaScript to your project
+
+$(document).ready(function(){
+
+    $("#example").DataTable({
+        // processing: true,
+        // serverSide: true,
+        // ajax : "/api/myData",
+    });
+
+    $("#authorsTable").DataTable({
+        processing: true,
+        serverSide: true,
+        ajax : "/authors",
+        dataSrc: "data",
+        lengthMenu: [ [5,10, 25, 50, -1], [5,10, 25, 50, "All"] ],
+        columns: [
+            { data: "src" },
+            { data: "name" },
+            { data: "surname" },
+            { data: "created_by" },
+            { data: "created_at" },
+            { data: "updated_at" }
+        ]
+    })
+})
+

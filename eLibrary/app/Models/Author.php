@@ -6,17 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class User extends Model
+class Author extends Model
 {
     use HasFactory,SoftDeletes;
 
-    public function role()
+    public function user()
     {
-        return $this->belongsTo(Role::class);
-    }
-
-    public function author()
-    {
-        return $this->hasMany(Author::class);
+        return $this->belongsTo(User::class,"created_by_user_id");
     }
 }
