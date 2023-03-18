@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text("description")->nullable();
             $table->integer("book_number")->unique();
             $table->foreignId("author_id")->constrained("authors");
-            $table->foreignId("created_by_user_id")->constrained("users");
+            $table->foreignId("created_by_user_id")->nullable()->default(NULL)->constrained("users");
             $table->softDeletes();
             $table->timestamps();
         });

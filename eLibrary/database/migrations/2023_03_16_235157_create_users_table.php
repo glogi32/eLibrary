@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string("email")->unique();
             $table->string("password");
             $table->foreignId("role_id")->constrained("roles");
-            $table->foreignId("created_by_user_id")->nullable()->constrained("users");
+            $table->foreignId("created_by_user_id")->nullable()->default(NULL)->constrained("users");
             $table->softDeletes();
             $table->timestamps();
         });

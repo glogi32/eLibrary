@@ -22,9 +22,9 @@ class AuthorResource extends JsonResource
             "surname" => $this->surname,
             "src" => $this->src,
             "alt" => $this->alt,
-            "created_by" => $this->user->name." ".$this->user->surname,
-            "created_at" => $this->created_at->format("d:m:Y"),
-            "updated_at" => $this->updated_at->format("d:m:Y"),
+            "created_by" => $this->user == null ? "/" : $this->user->name." ".$this->user->surname,
+            "created_at" => $this->created_at->format("d-m-Y"),
+            "updated_at" => $this->updated_at->format("d-m-Y"),
         ];
     }
 

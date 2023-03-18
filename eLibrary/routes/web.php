@@ -27,6 +27,8 @@ Route::get('/login', function () {
 Route::get("/options/authors",[PagesController::class,"authors"])->name("authors");
 
 Route::get("/authors",[AuthorController::class,"index"]);
+Route::post("/authors",[AuthorController::class,"store"])->name("addAuthor");
+Route::delete("/authors/{id}",[AuthorController::class,"destroy"])->name("deleteAuthor");
 
 Route::post("/login",[AuthController::class,"login"])->name("login");
 Route::get("/logout",[AuthController::class,"logout"])->name("logout");

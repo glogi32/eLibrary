@@ -1,26 +1,54 @@
 
 $(document).ready(function(){
 
-    $("#example").DataTable({
-        // processing: true,
-        // serverSide: true,
-        // ajax : "/api/myData",
-    });
-
     $("#authorsTable").DataTable({
         processing: true,
         serverSide: true,
         ajax : "/authors",
         dataSrc: "data",
-        lengthMenu: [ [5,10, 25, 50, -1], [5,10, 25, 50, "All"] ],
+        lengthMenu: [ [5,10, 25,    50, -1], [5,10, 25, 50, "All"] ],
+        order: [[4, 'desc']],
         columns: [
             { data: "src" },
             { data: "name" },
             { data: "surname" },
             { data: "created_by" },
             { data: "created_at" },
-            { data: "updated_at" }
+            { data: "updated_at" },
+            { data: "id",
+              render: function (data, type) {
+                return `<i class="fa fa-trash delete-icon author-delete" data-id="${data}" aria-hidden="true"></i>`;
+            }},
         ]
     })
+
+    
 })
 
+$(document).on("click",".author-delete",function(){
+    let id = $(this).data("id");
+    $("#deleteAuthor").modal("show");
+    $("#deleteAuthorButton").data("id",id);
+})
+
+$(document).on("click","#deleteAuthorButton",function(){
+    let id = $(this).data("id");
+    let token = $("input[name='_token']").val();
+
+    $.ajax({
+        url: '/authors/'+id,
+        method: "DELETE",
+        data:{
+            _token: token,
+        },
+        success: function(data){
+            console.log(data)
+            $("#authorsTable").DataTable().ajax.reload();
+            $("#deleteAuthor").modal("hide");
+        },
+        error: function(xhr){
+
+        }
+    })
+ 
+})

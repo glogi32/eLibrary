@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AuthorRequest;
 use App\Http\Resources\AuthorResource;
 use App\Models\Author;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AuthorController extends Controller
 {
@@ -53,7 +55,7 @@ class AuthorController extends Controller
         }else{
             $authors = $query->get();
         }
-
+        
         return AuthorResource::collection($authors)
                                 ->additional([
                                     "draw" => $draw,
@@ -75,9 +77,38 @@ class AuthorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(AuthorRequest $request)
     {
-        //
+        $author = new Author();
+
+        $author->name = $request->input("name");
+        $author->surname = $request->input("surname"); 
+     
+        if(session()->has("user")){
+            $author->created_by_user_id = session("user")->id;
+        }
+        $fileImage = $request->file("image");  
+
+        if($fileImage){
+            $fileName = time()."_".$fileImage->getClientOriginalName();
+            $directory = \public_path()."/img/authors/";
+            $path = "img/authors/".$fileName;
+
+            $fileUpload = $fileImage->move($directory,$fileName);
+
+            $author->src = $path;
+            $author->alt = $fileName;
+        }
+
+        
+        try {
+            $author->save();
+
+            return redirect()->back()->with("success",["message" => "Author successfully added."]);
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+            return redirect()->back()->with("error",["message" => "Server error, try again later."])->withInput();
+        }
     }
 
     /**
@@ -109,6 +140,22 @@ class AuthorController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $author = Author::find($id);
+
+        if(!$author){
+            return response()->json(["message" => "Author not fount"],404);
+        }
+
+        try {
+            $author->delete();
+            $author->save();
+
+            return response()->json('',204);
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+            return response()->json(["message" => "Server error, try again later"], 500);
+        }
+
+        
     }
 }

@@ -11286,3 +11286,10 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+
+/* MYSTYLES */
+
+.delete-icon{
+  font-size: 130%;
+  cursor: pointer;
+}
