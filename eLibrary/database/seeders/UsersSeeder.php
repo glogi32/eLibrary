@@ -24,7 +24,7 @@ class UsersSeeder extends Seeder
             $user->email = "test".$value."@gmail.com";
             $user->role_id = rand(1,2);
             $user->created_by_user_id = null;
-            $user->password = "test1234";
+            $user->password = md5("test1234");
             $user->save();
         }
     }

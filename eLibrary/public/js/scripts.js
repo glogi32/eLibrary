@@ -52,6 +52,28 @@ $(document).ready(function(){
         ]
     })
 
+    $("#usersTable").DataTable({
+        processing: true,
+        serverSide: true,
+        ajax : "/users",
+        dataSrc: "data",
+        lengthMenu: [ [5,10, 25, 50, -1], [5,10, 25, 50, "All"] ],
+        order: [[5, 'desc']],
+        columns: [
+            { data: "name" },
+            { data: "surname" },
+            { data: "email" },
+            { data: "role", orderable: false },
+            { data: "created_by", orderable: false },
+            { data: "created_at" },
+            { data: "updated_at" },
+            { data: "id",
+              render: function (data, type) {
+                return `<i class="fa fa-trash delete-icon user-delete" data-id="${data}" aria-hidden="true"></i>`;
+            }, orderable: false},
+        ]
+    })
+
     let roleId = $("#roleId").val();
    
     if(roleId && roleId!=1){
@@ -108,6 +130,35 @@ $(document).on("click","#deleteBookButton",function(){
             console.log(data)
             $("#booksTable").DataTable().ajax.reload();
             $("#deleteBook").modal("hide");
+        },
+        error: function(xhr){
+
+        }
+    })
+ 
+})
+
+
+$(document).on("click",".user-delete",function(){
+    let id = $(this).data("id");
+    $("#deleteUser").modal("show");
+    $("#deleteUserButton").data("id",id);
+})
+
+$(document).on("click","#deleteUserButton",function(){
+    let id = $(this).data("id");
+    let token = $("input[name='_token']").val();
+    
+    $.ajax({
+        url: '/users/'+id,
+        method: "DELETE",
+        data:{
+            _token: token,
+        },
+        success: function(data){
+            console.log(data)
+            $("#usersTable").DataTable().ajax.reload();
+            $("#deleteUser").modal("hide");
         },
         error: function(xhr){
 

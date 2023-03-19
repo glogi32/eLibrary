@@ -16,7 +16,7 @@ class AuthController extends Controller
         try {
             $user = User::with("role")->where([
                 ["email","=",$email],
-                ["password","=",$password]
+                ["password","=",md5($password)]
             ])->first();
 
             if(!empty($user)){

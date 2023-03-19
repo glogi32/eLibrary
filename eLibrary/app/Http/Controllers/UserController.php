@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\BookRequest;
-use App\Http\Resources\BookResource;
-use App\Models\Book;
+use App\Http\Requests\UserRequest;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-class BookController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,28 +22,28 @@ class BookController extends Controller
         $orderBy = $request->input("order")[0]["column"];
         $orderDir = $request->input("order")[0]["dir"];
         
-        $query = Book::with("user","author");
+        $query = User::with("role","user");
         $recordsTotal = $query->get()->count();
 
         if(!empty($search)){
-            $query = $query->where("title","like","%".$search."%")
-            ->orWhere("book_number","like","%".$search."%")
-            ->orWhereHas("author", function($query) use($search){
-                return $query->where("name","like","%".$search."%")
-                        ->orWhere("surname","like","%".$search."%");
+            $query->where("name","like","%".$search."%")
+            ->orWhere("surname","like","%".$search."%")
+            ->orWhere("email","like","%".$search."%")
+            ->orWhereHas("role",function($query) use($search){
+                return $query->where("name","like","%".$search."%");
             });
         }
 
-        $orderColumn = "title";
+        $orderColumn = "created_at";
         switch($orderBy){
             case 0:
-                $orderColumn = "title";
+                $orderColumn = "name";
                 break;
             case 1:
-                $orderColumn = "description";
+                $orderColumn = "surname";
                 break;
             case 2:
-                $orderColumn = "book_number";
+                $orderColumn = "email";
                 break;
             case 5:
                 $orderColumn = "created_at";
@@ -56,18 +57,17 @@ class BookController extends Controller
 
         $recordsFiltered = count($query->get());
         if($length != -1){
-            $authors = $query->skip($start)->take($length)->get();
+            $users = $query->skip($start)->take($length)->get();
         }else{
-            $authors = $query->get();
+            $users = $query->get();
         }
 
-        return BookResource::collection($authors)
+        return UserResource::collection($users)
                                 ->additional([
                                     "draw" => $draw,
                                     "recordsTotal" => $recordsTotal,
                                     "recordsFiltered" => $recordsFiltered
                                 ]);
-        
     }
 
     /**
@@ -81,19 +81,20 @@ class BookController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(BookRequest $request)
+    public function store(UserRequest $request)
     {
-        $book = new Book();
-        $book->title = $request->input("title");
-        $book->description = $request->input("description");
-        $book->book_number = time();
-        $book->author_id = $request->input("author");
-        $book->created_by_user_id = session("user")->id;
+        $user = new User();
+        $user->name = $request->input("name");
+        $user->surname = $request->input("surname");
+        $user->email = $request->input("email");
+        $user->password = md5($request->input("pass"));
+        $user->role_id = $request->input("role");
+        $user->created_by_user_id = session("user")->id;
         
         try {
-            $book->save();
+            $user->save();
 
-            return redirect()->back()->with("success",["message" => "Book successfully added."]);
+            return redirect()->back()->with("success",["message" => "User successfully added."]);
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
             return redirect()->back()->with("error",["message" => "Server error, try again later."]);
@@ -129,21 +130,20 @@ class BookController extends Controller
      */
     public function destroy(string $id)
     {
-        $book = Book::find($id);
+        $user = User::find($id);
 
-        if(!$book){
-            return response()->json(["message" => "Book not found!"],204);
+        if(!$user){
+            return response()->json(["message" => "User not found!"],204);
         }
 
         try {
-            $book->delete();
-            $book->save();
+            $user->delete();
+            $user->save();
 
             return response()->json('',204);
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
             return response()->json(["message" => "Server error, try again later"], 500);
         }
-      
     }
 }

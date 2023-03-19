@@ -19,4 +19,9 @@ class User extends Model
     {
         return $this->hasMany(Author::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,"created_by_user_id");
+    }
 }
