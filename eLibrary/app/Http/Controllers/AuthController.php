@@ -21,7 +21,7 @@ class AuthController extends Controller
 
             if(!empty($user)){
                 session()->put("user",$user);
-                return redirect("/")->with("success",["title" => "Success: ","message" => "Login is successful."]);
+                return redirect("/");
             }
             else{
                 return redirect("/login")->with("error",["title" => "Error login: ","message" => "Wrong credentials."]);

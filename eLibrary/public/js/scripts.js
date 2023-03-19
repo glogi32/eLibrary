@@ -9,10 +9,18 @@ $(document).ready(function(){
         lengthMenu: [ [5,10, 25,    50, -1], [5,10, 25, 50, "All"] ],
         order: [[4, 'desc']],
         columns: [
-            { data: "src" },
+            { data: "src",
+              render: function(data, type, full, meta){
+                if(data){
+                    return `<img src="${data}" alt="" style="width: 50px;"></img>`;
+                }else{
+                    return `/`
+                }
+              }
+            },
             { data: "name" },
             { data: "surname" },
-            { data: "created_by" },
+            { data: "created_by", orderable: false },
             { data: "created_at" },
             { data: "updated_at" },
             { data: "id",
@@ -22,6 +30,33 @@ $(document).ready(function(){
         ]
     })
 
+    $("#booksTable").DataTable({
+        processing: true,
+        serverSide: true,
+        ajax : "/books",
+        dataSrc: "data",
+        lengthMenu: [ [5,10, 25, 50, -1], [5,10, 25, 50, "All"] ],
+        order: [[5, 'desc']],
+        columns: [
+            { data: "title" },
+            { data: "description" },
+            { data: "book_number" },
+            { data: "author", orderable: false },
+            { data: "created_by", orderable: false },
+            { data: "created_at" },
+            { data: "updated_at" },
+            { data: "id",
+              render: function (data, type) {
+                return `<i class="fa fa-trash delete-icon book-delete" data-id="${data}" aria-hidden="true"></i>`;
+            }},
+        ]
+    })
+
+    let roleId = $("#roleId").val();
+   
+    if(roleId && roleId!=1){
+        $("#booksTable").DataTable().column(7).visible(false)
+    }
     
 })
 
@@ -45,6 +80,34 @@ $(document).on("click","#deleteAuthorButton",function(){
             console.log(data)
             $("#authorsTable").DataTable().ajax.reload();
             $("#deleteAuthor").modal("hide");
+        },
+        error: function(xhr){
+
+        }
+    })
+ 
+})
+
+$(document).on("click",".book-delete",function(){
+    let id = $(this).data("id");
+    $("#deleteBook").modal("show");
+    $("#deleteBookButton").data("id",id);
+})
+
+$(document).on("click","#deleteBookButton",function(){
+    let id = $(this).data("id");
+    let token = $("input[name='_token']").val();
+    
+    $.ajax({
+        url: '/books/'+id,
+        method: "DELETE",
+        data:{
+            _token: token,
+        },
+        success: function(data){
+            console.log(data)
+            $("#booksTable").DataTable().ajax.reload();
+            $("#deleteBook").modal("hide");
         },
         error: function(xhr){
 
